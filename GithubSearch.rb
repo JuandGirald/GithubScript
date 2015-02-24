@@ -199,6 +199,7 @@ countries.each do |country|
   begin
     users = GithubSearch.get_users(country, 'Python', '', page, 1) 
     
+  if users 
     if users != "The page is empty"
       users.each do |user|
         api.add_contact(user[:name], user[:date_joined], user[:followers], user[:location], user[:public_repos], 
@@ -206,6 +207,7 @@ countries.each do |country|
       end
       print users.length
     end
+  end
     
     page +=1
     sleep 30
