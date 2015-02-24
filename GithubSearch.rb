@@ -8,7 +8,7 @@ require 'uri'
 # Search developers in github filtered by location and language
 #
 class GithubSearch
-  @token = '470becc80b148d0156151d94f28466555dfaa4dc'
+  @token = 'My Github Outh token'
 
   # Get all the users filtered by language and location in an specific page
   #
@@ -130,7 +130,7 @@ class LessAnnoyingCrm
 
   def initialize
     @apitoken = "Your lessannoyingcrm apitoken"
-    @usercode = "Yout lessannoyingcrm usercode"
+    @usercode = "Your lessannoyingcrm usercode"
   end
 
   def add_contact(name, date_joined, followers, location, public_repos, email, most_popular_repos, repo_url, language)
