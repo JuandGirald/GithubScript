@@ -8,11 +8,11 @@ require 'uri'
 # Search developers in github filtered by location and language
 #
 class GithubSearch
-  @token = 'My Github Outh token'
+  @token = 'Your GitHub Outh Token'
 
   # Get all the users filtered by language and location in an specific page
   #
-  def self.get_users(location, language, page, user_id)
+  def self.get_users(location, language, keyword, page, user_id)
     developers = []
     response = HTTParty.get(
               "https://api.github.com/search/users?q=+location:#{location}+language:#{language}&per_page=20&sort=followers&page=#{page}", 
@@ -26,7 +26,7 @@ class GithubSearch
       if !users.empty?
         users.each do |user|
           url = user['url']
-          developer = get_user_information(url, language, user_id)
+          developer = get_user_information(url, language, keyword, user_id)
           stars     = developer[:popular_repos].empty? ? 0 : developer[:popular_repos].first[:stars]
           # id        = developer[:last_id]
 
@@ -64,7 +64,7 @@ class GithubSearch
   # Url: Github url of the developer
   # Language: Code language
   #
-  def self.get_user_information(url, language, user_id)
+  def self.get_user_information(url, language, keyword, user_id)
     response = HTTParty.get("#{url}",
               :headers => {
                 "Authorization" => "token #{@token}",
@@ -78,7 +78,10 @@ class GithubSearch
     location     =  response.parsed_response['location']
     public_repos =  response.parsed_response['public_repos']
 
-    popular_repos = get_popular_repos(response.parsed_response['login'])
+    popular_repos = get_popular_repos(response.parsed_response['login'], keyword)
+    if !keyword.empty?
+      language = keyword
+    end
     # last_id =  popular_repos.empty? ? 0 : popular_repos.last[:id]
 
     information = {
@@ -98,9 +101,9 @@ class GithubSearch
   # Get the information for the popular repos of the developer found
   # User: Developer
   #
-  def self.get_popular_repos(user)
+  def self.get_popular_repos(user, keyword)
     response = HTTParty.get(
-              "https://api.github.com/search/repositories?q=user:#{user}&sort=stars&order=desc&per_page=5",
+              "https://api.github.com/search/repositories?q=#{keyword}+user:#{user}&sort=stars&order=desc&per_page=5",
               :headers => {
                 "Authorization" => "token #{@token}",
                 "User-Agent" => "juandgirald"
@@ -129,8 +132,8 @@ end
 class LessAnnoyingCrm
 
   def initialize
-    @apitoken = "Your lessannoyingcrm apitoken"
-    @usercode = "Your lessannoyingcrm usercode"
+    @apitoken = "Your LessAnnoyingCrm apitoken"
+    @usercode = "Your LessAnnoyingCrm usercode"
   end
 
   def add_contact(name, date_joined, followers, location, public_repos, email, most_popular_repos, repo_url, language)
@@ -162,8 +165,25 @@ end
 # Countries where you want to search developers
 #
 countries = [
-'Colombia',
-'Argentina'
+'Jamaica',
+'Japan',
+'Jordan',
+'Kazakhstan',
+'Kenya',
+'Kiribati',
+'Korea',
+'Kosovo',
+'Kuwait',
+'Kyrgyzstan',
+'Laos',
+'Latvia',
+'Lebanon',
+'Lesotho',
+'Liberia',
+'Libya',
+'Liechtenstein',
+'Lithuania',
+'Luxembourg'
 ]
 
 # Iterates the countries array to provide a country attribute, 
@@ -177,7 +197,7 @@ countries.each do |country|
 
   api   = LessAnnoyingCrm.new()
   begin
-    users = GithubSearch.get_users(country, 'Python', page, 1) 
+    users = GithubSearch.get_users(country, 'Python', '', page, 1) 
     
     if users != "The page is empty"
       users.each do |user|
@@ -186,7 +206,6 @@ countries.each do |country|
       end
       print users.length
     end
-
     
     page +=1
     sleep 30
